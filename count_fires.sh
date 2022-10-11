@@ -11,32 +11,45 @@ cut -d, -f2 calfire.csv
 nano calfire.csv
 
 #print out range of years and sort
-cut -d, -f2 calfire.csv > year
-sort year 
+sort -t, -k2,2n calfire.csv | cut -d, -f2
 
-#year range: 2017~2021
 
 MINYEAR=2017
 MAXYEAR=2021
 # write code to set these variables with the smallest and largest years
 echo "This report has the years: $MINYEAR-$MAXYEAR"
+
 # if you have problems the CSV file already part of this repository so you can use 'calfires_2021.csv'
 
 # print out the total number of fires (remember to remove the header line)
 TOTALFILECOUNT=0
+
+
 # put your code here to update this variable
+sed '1d' calfire.csv  > no_header.csv
+
+wc -l no_header.csv >filenumber.csv
+TOTALFILECOUNT=$(awk '{print $1}' filenumber.csv)
+ 
+
 echo "Total number of files: $TOTALFILECOUNT"
 
 # print out the number of fire in each year
-echo "Number of fires in each year follows:"
 
+echo "Number of fires in each year follows:"
+sort -t, -k2,2n no_header.csv| cut -d, -f2 |uniq -c
 
 # print out the name of the largest file use the GIS_ACRES and report the number of acres
+
+sort -t, -k13,13nr no_header.csv| cut -d, -f6,13 | awk -F, 'NR == 1 {print}' > largest.csv
+LARGEST=$(awk -F, '{print $1}' largest.csv)
+LARGESTACRES=$(awk -F, '{print $2}' largest.csv)
 echo "Largest fire was $LARGEST and burned $LARGESTACRES"
 
 # print out the years - change the code in $(echo 1990) to print out the years (hint - how did you get MINYEAR and MAXYEAR?
-for YEAR in $(echo 1990)
-do
-#      TOTAL=$(grep ... | awk ...)
+sort -t, -k2,2nr no_header.csv| cut -d, -f2,13 > year.csv
+for YEAR in $(awk -F, '{print $1}' year.csv);
+ do
+    TOTAL=$(grep $YEAR year.csv| awk -F, '{sum+=$2;} END{print sum;}')
       echo "In Year $YEAR, Total was $TOTAL"
-done
+ done
