@@ -28,8 +28,8 @@ TOTALFILECOUNT=0
 # put your code here to update this variable
 sed '1d' calfire.csv  > no_header.csv
 
-wc -l no_header.csv >filenumber.csv
-TOTALFILECOUNT=$(awk '{print $1}' filenumber.csv)
+
+TOTALFILECOUNT=$(cat no_header.csv | wc -l)
  
 
 echo "Total number of files: $TOTALFILECOUNT"
